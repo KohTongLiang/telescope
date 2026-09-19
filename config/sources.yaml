@@ -1,0 +1,237 @@
+# Telescope sources
+#
+# Every feed below was verified 2026-09-15 by direct request: HTTP status, body
+# type, item count and age of newest item. Source health is re-checked on every
+# sync and reported in the digest footer, so this is a starting point, not a
+# guarantee. A feed that dies is surfaced rather than silently ignored.
+#
+# tier: first_party | trade | enthusiast | aggregator | community
+# axis: business | development | releases | platform | general | community
+
+# ---------------------------------------------------------------- trade press
+
+- id: gamesindustry
+  name: GamesIndustry.biz
+  url: https://www.gamesindustry.biz/feed
+  tier: trade
+  axis: business
+  max_age_hours: 48
+
+- id: mcv
+  name: MCV/Develop
+  url: https://www.mcvuk.com/feed/
+  tier: trade
+  axis: business
+  max_age_hours: 72
+
+- id: vgc
+  name: Video Games Chronicle
+  url: https://www.videogameschronicle.com/feed/
+  tier: trade
+  axis: business
+  max_age_hours: 48
+
+# Recovered via Google News because the site itself is behind Cloudflare (403).
+# Trade-offs: links are Google redirects and summaries are thin. Good for
+# coverage and story breadth, not for reading.
+- id: gamedeveloper
+  name: Game Developer
+  url: https://news.google.com/rss/search?q=site:gamedeveloper.com+when:2d&hl=en-US&gl=US&ceid=US:en
+  tier: trade
+  axis: development
+  max_age_hours: 72
+
+- id: kotaku
+  name: Kotaku
+  url: https://news.google.com/rss/search?q=site:kotaku.com+when:2d&hl=en-US&gl=US&ceid=US:en
+  tier: enthusiast
+  axis: general
+  max_age_hours: 72
+
+# ------------------------------------------------------ enthusiast / consumer
+
+- id: eurogamer
+  name: Eurogamer
+  url: https://www.eurogamer.net/feed
+  tier: enthusiast
+  axis: general
+  max_age_hours: 24
+
+- id: rps
+  name: Rock Paper Shotgun
+  url: https://www.rockpapershotgun.com/feed
+  tier: enthusiast
+  axis: general
+  max_age_hours: 24
+
+- id: pcgamesn
+  name: PCGamesN
+  url: https://www.pcgamesn.com/feed
+  tier: enthusiast
+  axis: general
+  max_age_hours: 24
+
+- id: gamesradar
+  name: GamesRadar
+  url: https://www.gamesradar.com/feeds/all/
+  tier: enthusiast
+  axis: general
+  max_age_hours: 24
+
+- id: pcgamer
+  name: PC Gamer
+  url: https://www.pcgamer.com/rss/
+  tier: enthusiast
+  axis: general
+  max_age_hours: 24
+
+- id: gamespot
+  name: GameSpot
+  url: https://www.gamespot.com/feeds/news/
+  tier: enthusiast
+  axis: general
+  max_age_hours: 24
+
+- id: ign
+  name: IGN
+  url: https://feeds.ign.com/ign/all
+  tier: enthusiast
+  axis: general
+  max_age_hours: 48
+
+- id: polygon
+  name: Polygon
+  url: https://www.polygon.com/rss/index.xml
+  tier: enthusiast
+  axis: general
+  max_age_hours: 72
+
+- id: theverge
+  name: The Verge Games
+  url: https://www.theverge.com/rss/games/index.xml
+  tier: enthusiast
+  axis: general
+  max_age_hours: 72
+
+- id: aftermath
+  name: Aftermath
+  url: https://aftermath.site/feed
+  tier: enthusiast
+  axis: general
+  max_age_hours: 48
+
+- id: thegamer
+  name: TheGamer
+  url: https://www.thegamer.com/feed/
+  tier: enthusiast
+  axis: general
+  max_age_hours: 48
+
+- id: gamerant
+  name: Game Rant
+  url: https://gamerant.com/feed/
+  tier: aggregator
+  axis: general
+  max_age_hours: 48
+
+# ------------------------------------------------------- development / tools
+
+- id: arstechnica
+  name: Ars Technica Gaming
+  url: https://feeds.arstechnica.com/arstechnica/gaming
+  tier: enthusiast
+  axis: development
+  max_age_hours: 72
+
+- id: automaton
+  name: Automaton
+  url: https://automaton-media.com/en/feed/
+  tier: enthusiast
+  axis: development
+  max_age_hours: 48
+
+- id: 80lv
+  name: 80.lv
+  url: https://80.lv/feed/
+  tier: enthusiast
+  axis: development
+  max_age_hours: 72
+
+- id: unityblog
+  name: Unity Blog
+  url: https://blog.unity.com/feed
+  tier: first_party
+  axis: development
+  max_age_hours: 336   # publishes weekly; a tighter limit would cry wolf
+
+# ----------------------------------------------------------------- platforms
+
+- id: psblog
+  name: PlayStation Blog
+  url: https://blog.playstation.com/feed/
+  tier: first_party
+  axis: platform
+  max_age_hours: 72
+
+- id: xboxwire
+  name: Xbox Wire
+  url: https://news.xbox.com/en-us/feed/
+  tier: first_party
+  axis: platform
+  max_age_hours: 72
+
+- id: nintendolife
+  name: Nintendo Life
+  url: https://www.nintendolife.com/feeds/latest
+  tier: enthusiast
+  axis: platform
+  max_age_hours: 24
+
+- id: pushsquare
+  name: Push Square
+  url: https://www.pushsquare.com/feeds/latest
+  tier: enthusiast
+  axis: platform
+  max_age_hours: 24
+
+- id: purexbox
+  name: Pure Xbox
+  url: https://www.purexbox.com/feeds/latest
+  tier: enthusiast
+  axis: platform
+  max_age_hours: 24
+
+# Nintendo publishes no official feed; this is the closest equivalent.
+- id: nintendoeverything
+  name: Nintendo Everything
+  url: https://nintendoeverything.com/feed/
+  tier: enthusiast
+  axis: platform
+  max_age_hours: 48
+
+# ------------------------------------------------------ Japan / Asia releases
+
+- id: gematsu
+  name: Gematsu
+  url: https://www.gematsu.com/feed
+  tier: enthusiast
+  axis: releases
+  max_age_hours: 48
+
+- id: siliconera
+  name: Siliconera
+  url: https://www.siliconera.com/feed/
+  tier: enthusiast
+  axis: releases
+  max_age_hours: 48
+
+# ------------------------------------------------------ community / sentiment
+
+# Low tier on purpose. Useful as a "what is actually landing" signal, and its
+# link-sharing duplicates real stories, which legitimately raises their breadth.
+- id: reddit_games
+  name: Reddit r/Games
+  url: https://www.reddit.com/r/Games/.rss
+  tier: community
+  axis: community
+  max_age_hours: 24

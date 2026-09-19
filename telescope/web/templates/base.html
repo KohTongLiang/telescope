@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }} · Telescope</title>
+<link rel="stylesheet" href="{{ url_for('static', path='app.css') }}">
+<script src="{{ url_for('static', path='htmx.min.js') }}" defer></script>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/"><span class="scope">◉</span> Telescope</a>
+  <nav class="nav">
+    <a href="/" {% if page == 'dashboard' %}class="active" aria-current="page"{% endif %}>Overview</a>
+    <a href="/digests" {% if page == 'digests' %}class="active" aria-current="page"{% endif %}>Digests</a>
+    <a href="/stories" {% if page == 'stories' %}class="active" aria-current="page"{% endif %}>Stories</a>
+    <a href="/items" {% if page == 'items' %}class="active" aria-current="page"{% endif %}>Items</a>
+    <a href="/sources" {% if page == 'sources' %}class="active" aria-current="page"{% endif %}>Sources</a>
+  </nav>
+  <form class="topsearch" action="/items" method="get" role="search">
+    <input type="search" name="q" value="{{ q }}" placeholder="Search…" aria-label="Search items" autocomplete="off">
+  </form>
+</header>
+<main class="wrap">
+{% block content %}{% endblock %}
+</main>
+<footer class="footer">
+  <span>Read-only view of <code>var/telescope.db</code></span>
+  {% if digest_dir %}<span>digests → <code>{{ digest_dir }}</code></span>{% endif %}
+</footer>
+</body>
+</html>

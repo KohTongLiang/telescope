@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+<nav class="crumbs"><a href="/sources">← All sources</a></nav>
+
+<section class="card">
+  <h1>{{ source.name }}</h1>
+  <p class="meta">
+    <span class="mono">{{ source.id }}</span>
+    <span class="sep">·</span><span>{{ source.tier.replace('_', ' ') }}</span>
+    <span class="sep">·</span><span>{{ source.axis }}</span>
+    <span class="sep">·</span><span class="state {{ 'ok' if source.enabled else 'disabled' }}">{{ 'enabled' if source.enabled else 'disabled' }}</span>
+  </p>
+  <table class="kv">
+    <tr><th>feed</th><td class="mono clip"><a href="{{ source.url }}" target="_blank" rel="noopener noreferrer">{{ source.url }}</a></td></tr>
+    <tr><th>last success</th><td>{{ source.last_success_at|local }} <span class="muted">({{ source.last_success_at|age }})</span></td></tr>
+    <tr><th>last HTTP</th><td>{{ source.last_http_status or '—' }}</td></tr>
+    <tr><th>newest item</th><td>{% if source.last_item_age_hours is not none %}{{ '%.1f'|format(source.last_item_age_hours) }}h old (limit {{ source.max_age_hours }}h){% else %}unknown{% endif %}</td></tr>
+    {% if source.last_error %}<tr><th>last error</th><td class="bad">{{ source.last_error }}</td></tr>{% endif %}
+  </table>
+</section>
+
+{% if history %}
+<section class="card">
+  <h2>Last {{ history|length }} fetches</h2>
+  <table class="table">
+    <thead><tr><th>Started</th><th>Status</th><th class="num">HTTP</th><th class="num">Found</th><th class="num">New</th><th class="num">ms</th><th>Error</th></tr></thead>
+    <tbody>
+      {% for h in history %}
+      <tr>
+        <td class="muted">{{ h['started_at']|local }}</td>
+        <td>{{ h['status'] }}</td>
+        <td class="num">{{ h['http_status'] or '—' }}</td>
+        <td class="num">{{ h['items_found'] }}</td>
+        <td class="num">{{ h['items_new'] }}</td>
+        <td class="num muted">{{ h['duration_ms'] }}</td>
+        <td class="muted clip">{{ h['error'] or '' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+
+<section class="card">
+  <div class="card-head">
+    <h2>Stored items</h2>
+    <a class="more" href="/items?source={{ source.id }}">all {{ total }} →</a>
+  </div>
+  <ul class="plain">
+    {% for item in items %}
+    <li>
+      <a href="/items/{{ item.id }}">{{ item.title }}</a>
+      <span class="muted">{{ item.when|age }}</span>
+    </li>
+    {% else %}
+    <li class="muted">nothing stored from this source</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

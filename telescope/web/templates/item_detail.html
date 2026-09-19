@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<nav class="crumbs"><a href="/items">← All items</a></nav>
+
+<article class="card">
+  <h1 class="item-title">{{ item.title }}</h1>
+  <p class="meta">
+    <a class="source" href="/sources/{{ item.source_id }}">{{ item.source_name }}</a>
+    <span class="sep">·</span>
+    <span title="{{ item.when|local }}">{{ item.when|age }}</span>
+    <span class="sep">·</span>
+    <span class="tier tier-{{ item.tier }}">{{ item.tier.replace('_', ' ') }}</span>
+    {% if item.author %}<span class="sep">·</span><span>{{ item.author }}</span>{% endif %}
+  </p>
+
+  {% if item.summary %}<p class="lead">{{ item.summary }}</p>{% endif %}
+
+  <p><a class="primary link" href="{{ item.url }}" target="_blank" rel="noopener noreferrer">Read at {{ item.source_name }} →</a></p>
+
+  {% if item.topics or item.categories or item.entities %}
+  <div class="chips">
+    {% for t in item.topics %}<a class="chip topic" href="/items?topic={{ t|urlencode }}">{{ t }}</a>{% endfor %}
+    {% for c in item.categories %}<a class="chip tag" href="/items?tag={{ c|urlencode }}">{{ c }}</a>{% endfor %}
+    {% for e in item.entities %}<span class="chip entity">{{ e }}</span>{% endfor %}
+  </div>
+  {% endif %}
+
+  <table class="kv">
+    <tr><th>id</th><td class="mono">{{ item.id }}</td></tr>
+    <tr><th>guid</th><td class="mono">{{ item.guid }}</td></tr>
+    <tr><th>kind</th><td>{{ item.kind }}</td></tr>
+    <tr><th>published</th><td>{{ item.published_at|local }} {% if not item.published_at %}<span class="warn">(none — fetched time used)</span>{% endif %}</td></tr>
+    <tr><th>fetched</th><td>{{ item.fetched_at|local }}</td></tr>
+    <tr><th>canonical</th><td class="mono clip">{{ item.canonical_url }}</td></tr>
+  </table>
+</article>
+
+{% if related %}
+<section class="card">
+  <h2>Also from {{ item.source_name }}</h2>
+  <ul class="plain">
+    {% for r in related %}
+    <li><a href="/items/{{ r.id }}">{{ r.title }}</a> <span class="muted">{{ r.when|age }}</span></li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+{% endblock %}

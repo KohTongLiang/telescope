@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-head">
+  <h1>Overview</h1>
+  <p class="muted">Everything Telescope has stored, plus the state of the pipeline that filled it.</p>
+</section>
+
+<div class="statgrid">
+  <a class="stat" href="/items"><span class="num">{{ stats.items }}</span><span class="lab">items stored</span></a>
+  <a class="stat" href="/digests"><span class="num">{{ stats.digests }}</span><span class="lab">digests written</span></a>
+  <a class="stat" href="/sources"><span class="num">{{ health.ok_count }}/{{ health.total }}</span><span class="lab">sources OK</span></a>
+  <a class="stat"><span class="num">{{ last_sync_at|age }}</span><span class="lab">last sync</span></a>
+  <a class="stat"><span class="num">{{ last_digest_at|age }}</span><span class="lab">last digest</span></a>
+</div>
+
+{% if digest %}
+<section class="card">
+  <div class="card-head">
+    <h2>Latest digest</h2>
+    <a class="more" href="/digests/{{ digest.id }}">Open →</a>
+  </div>
+  <p class="lead">{{ digest.day }} · {{ digest.items_considered }} items → {{ digest.stories }} stories · {{ digest.coverage }} sources OK</p>
+  <p class="muted">window {{ digest.window_start|local }} → {{ digest.window_end|local }}</p>
+</section>
+{% else %}
+<section class="card">
+  <h2>No digests yet</h2>
+  <p class="muted">Run <code>telescope digest</code> to write one. The items below are already searchable.</p>
+</section>
+{% endif %}
+
+<div class="two-col">
+  <section class="card">
+    <div class="card-head">
+      <h2>Recent digests</h2>
+      {% if digest_total > digests|length %}<a class="more" href="/digests">all {{ digest_total }} →</a>{% endif %}
+    </div>
+    {% if digests %}
+    <ul class="plain">
+      {% for d in digests %}
+      <li>
+        <a href="/digests/{{ d.id }}">{{ d.day }}</a>
+        <span class="muted">{{ d.stories }} stories · {{ d.coverage }} OK</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}<p class="muted">none yet</p>{% endif %}
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h2>Topics</h2>
+      <a class="more" href="/items">browse →</a>
+    </div>
+    <div class="chips">
+      {% for facet in topics %}
+      <a class="chip topic" href="/items?topic={{ facet.name|urlencode }}">{{ facet.name }} <b>{{ facet.count }}</b></a>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+
+<section class="card">
+  <div class="card-head">
+    <h2>Pipeline</h2>
+    <a class="more" href="/sources">sources →</a>
+  </div>
+  <p class="lead">{{ health.summary_line }}</p>
+  {% if health.stale or health.failing %}
+  <ul class="plain">
+    {% for s in health.stale %}<li class="warn">{{ s.name }} — stale, newest item {{ s.item_age_hours|round(1) }}h old</li>{% endfor %}
+    {% for s in health.failing %}<li class="bad">{{ s.name }} — {{ s.last_error or s.state }} (x{{ s.consecutive_failures }})</li>{% endfor %}
+  </ul>
+  {% else %}
+  <p class="muted">Every configured source is healthy.</p>
+  {% endif %}
+</section>
+{% endblock %}

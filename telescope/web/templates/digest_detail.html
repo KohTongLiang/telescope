@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<nav class="crumbs"><a href="/digests">← All digests</a></nav>
+
+<header class="digest-head">
+  <h1>{{ digest.day }} digest</h1>
+  <div class="statrow">
+    <span class="pill">{{ digest.items_considered }} items</span>
+    <span class="pill">{{ digest.stories }} stories</span>
+    <span class="pill">{{ digest.coverage }} sources OK</span>
+    {% if digest.stale_sources %}<span class="pill warn">{{ digest.stale_sources }} stale</span>{% endif %}
+  </div>
+  <p class="muted">
+    generated {{ digest.generated_at|local }} ·
+    window {{ digest.window_start|local }} → {{ digest.window_end|local }}
+  </p>
+  <p class="actions">
+    <a href="/digests/{{ digest.id }}/raw">raw markdown</a>
+    {% if digest.path %}<code class="clip">{{ digest.path }}</code>{% endif %}
+  </p>
+</header>
+
+{% if sections %}
+<nav class="toc">
+  {% for s in sections %}<a href="#{{ s.anchor }}">{{ s.title }}</a>{% endfor %}
+</nav>
+{% endif %}
+
+{% if body %}
+<article class="markdown">{{ body|safe }}</article>
+{% elif error %}
+<p class="error">{{ error }}</p>
+{% else %}
+<p class="muted">This digest row has no file path, so there is nothing to render.</p>
+{% endif %}
+{% endblock %}

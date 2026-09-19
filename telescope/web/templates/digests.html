@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-head">
+  <h1>Digests</h1>
+  <p class="muted">{{ total }} recorded in the database. The markdown itself lives in the Drive folder.</p>
+</section>
+
+{% if digests %}
+<table class="table">
+  <thead>
+    <tr><th>Day</th><th>Generated</th><th class="num">Items</th><th class="num">Stories</th><th class="num">Sources</th><th>File</th></tr>
+  </thead>
+  <tbody>
+    {% for d in digests %}
+    <tr>
+      <td><a class="strong" href="/digests/{{ d.id }}">{{ d.day }}</a></td>
+      <td class="muted">{{ d.generated_at|local }}</td>
+      <td class="num">{{ d.items_considered }}</td>
+      <td class="num">{{ d.stories }}</td>
+      <td class="num {% if d.stale_sources %}warn{% endif %}">{{ d.coverage }}{% if d.stale_sources %} · {{ d.stale_sources }} stale{% endif %}</td>
+      <td class="muted mono clip">{{ d.path or '—' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% if offset or has_next %}
+<nav class="pager">
+  {% if offset %}<a href="/digests?offset={{ prev_offset }}">← Newer</a>{% endif %}
+  <span class="muted">{{ offset + 1 }}–{{ [offset + limit, total]|min }} of {{ total }}</span>
+  {% if has_next %}<a href="/digests?offset={{ next_offset }}">Older →</a>{% endif %}
+</nav>
+{% endif %}
+{% else %}
+<p class="empty">No digests recorded yet. Run <code>telescope digest</code>.</p>
+{% endif %}
+{% endblock %}

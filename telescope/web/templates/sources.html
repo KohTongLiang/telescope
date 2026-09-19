@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-head">
+  <h1>Sources</h1>
+  <p class="muted">{{ health.summary_line }} · last sync {{ health.last_sync_at|age }}</p>
+</section>
+
+{% if health.stale or health.failing %}
+<section class="card">
+  <h2>Needs attention</h2>
+  <ul class="plain">
+    {% for s in health.stale %}<li class="warn"><b>{{ s.name }}</b> — stale, newest item {{ '%.1f'|format(s.item_age_hours) }}h old</li>{% endfor %}
+    {% for s in health.failing %}<li class="bad"><b>{{ s.name }}</b> — {{ s.last_error or s.state }} (x{{ s.consecutive_failures }})</li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Source</th><th>Tier</th><th>Axis</th><th>State</th>
+      <th>Last OK</th><th class="num">Newest</th><th class="num">HTTP</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <tr>
+      <td><a class="strong" href="/sources/{{ row.source_id }}">{{ row.name }}</a></td>
+      <td class="muted">{{ row.tier.replace('_', ' ') }}</td>
+      <td class="muted">{{ by_id[row.source_id].axis }}</td>
+      <td><span class="state {{ row.state }}">{{ row.state.replace('_', ' ') }}</span></td>
+      <td class="muted">{{ row.last_success_at|age }}</td>
+      <td class="num">{% if row.item_age_hours is not none %}{{ '%.1f'|format(row.item_age_hours) }}h{% else %}—{% endif %}</td>
+      <td class="num muted">{{ by_id[row.source_id].last_http_status or '—' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

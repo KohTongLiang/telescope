@@ -1,0 +1,39 @@
+# Entities you care about. Any story mentioning one of these gets a ranking
+# boost and its own digest section, regardless of how globally important it is.
+#
+# Matching is case-insensitive and word-boundary anchored.
+#
+# "Headphone Turtle" is a guess from your Drive account name — edit or delete it.
+
+entities:
+  - Headphone Turtle
+
+  # Studios and publishers worth tracking beyond the built-in list
+  - Larian Studios
+  - Supergiant Games
+  - Motion Twin
+  - Extremely OK Games
+  - Playdead
+  - Thatgamecompany
+  - Hello Games
+  - Team Cherry
+  - ConcernedApe
+  - ZA/UM
+  - Campo Santo
+  - Die Gute Fabrik
+  - Strange Scaffold
+
+# Topics always given a section in the digest, in this order.
+#
+# "Releases & delays" is deliberately last: its rules match almost every
+# product story, so listing it first turns it into a dumping ground that hides
+# the more specific topics below it.
+topics:
+  - Layoffs & closures
+  - M&A & funding
+  - Legal & labour
+  - Platform & store
+  - Tools & engines
+  - Hardware
+  - Business & earnings
+  - Releases & delays

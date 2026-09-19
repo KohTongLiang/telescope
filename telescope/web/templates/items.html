@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block content %}
+<section id="items-main" class="browse">
+  <form class="filters" method="get" action="/items"
+        hx-get="/items" hx-target="#items-main" hx-select="#items-main"
+        hx-swap="outerHTML" hx-push-url="true"
+        hx-trigger="submit, change, keyup changed delay:350ms from:#q"
+        hx-indicator="#busy">
+
+    <div class="page-head compact">
+      <h1>Items</h1>
+      <p class="muted">Every stored article. Search runs over titles and summaries with SQLite FTS5.</p>
+    </div>
+
+    <div class="searchrow">
+      <input id="q" type="search" name="q" value="{{ filters.q }}" autocomplete="off" spellcheck="false"
+             placeholder="Search titles and summaries — &quot;quoted phrases&quot; and OR work">
+      <button type="submit" class="primary">Search</button>
+      {% if filters.active %}
+      <a class="clear" href="/items">Clear {{ filters.active_count }} filter{% if filters.active_count != 1 %}s{% endif %}</a>
+      {% endif %}
+      <span id="busy" class="htmx-indicator busy">searching…</span>
+    </div>
+
+    <div class="columns">
+      <aside class="facets">
+        <fieldset>
+          <legend>Window</legend>
+          <select name="days">
+            {% for value, label in day_choices %}
+            <option value="{{ value }}" {% if filters.days == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </fieldset>
+
+        {% if kinds and kinds|length > 1 %}
+        <fieldset>
+          <legend>Kind</legend>
+          <select name="kind">
+            <option value="">Any</option>
+            {% for k in kinds %}
+            <option value="{{ k }}" {% if filters.kind == k %}selected{% endif %}>{{ k }}</option>
+            {% endfor %}
+          </select>
+        </fieldset>
+        {% endif %}
+
+        <fieldset class="facet">
+          <legend>Topic <span class="hint">digest section</span></legend>
+          {% for facet in facets.topics %}
+          <label class="check">
+            <input type="checkbox" name="topic" value="{{ facet.name }}" {% if facet.name in filters.topics %}checked{% endif %}>
+            <span class="fname">{{ facet.name }}</span>
+            <span class="fcount">{{ facet.count }}</span>
+          </label>
+          {% else %}
+          <p class="muted small">No topics match the current filters.</p>
+          {% endfor %}
+        </fieldset>
+
+        <fieldset class="facet">
+          <legend>Tag <span class="hint">category from the feed</span></legend>
+          {% for facet in facets.tags %}
+          <label class="check">
+            <input type="checkbox" name="tag" value="{{ facet.name }}" {% if facet.name in filters.tags %}checked{% endif %}>
+            <span class="fname">{{ facet.name }}</span>
+            <span class="fcount">{{ facet.count }}</span>
+          </label>
+          {% else %}
+          <p class="muted small">No tags match the current filters.</p>
+          {% endfor %}
+        </fieldset>
+
+        <fieldset class="facet">
+          <legend>Source</legend>
+          {% for facet in facets.sources %}
+          <label class="check">
+            <input type="checkbox" name="source" value="{{ facet.id }}" {% if facet.id in filters.sources %}checked{% endif %}>
+            <span class="fname" title="{{ facet.id }}">{{ facet.name }}</span>
+            <span class="fcount">{{ facet.count }}</span>
+          </label>
+          {% else %}
+          <p class="muted small">No sources match the current filters.</p>
+          {% endfor %}
+        </fieldset>
+      </aside>
+
+      <div class="results">
+        <div class="resultbar">
+          <span><b>{{ total }}</b> item{% if total != 1 %}s{% endif %}{% if filters.active %} matching{% endif %}</span>
+          {% if total %}<span class="muted">showing {{ showing_from }}–{{ showing_to }} · {{ filters.days_label }}</span>{% endif %}
+        </div>
+
+        {% if filters.active %}
+        <div class="chips selected">
+          {% if filters.q %}<a class="chip on" href="/items?{{ filters.cleared().query_string() }}">“{{ filters.q }}” ✕</a>{% endif %}
+          {% for t in filters.topics %}<a class="chip topic on" href="/items?{{ filters.toggled('topics', t).query_string() }}">{{ t }} ✕</a>{% endfor %}
+          {% for t in filters.tags %}<a class="chip tag on" href="/items?{{ filters.toggled('tags', t).query_string() }}">{{ t }} ✕</a>{% endfor %}
+          {% for s in filters.sources %}<a class="chip source on" href="/items?{{ filters.toggled('sources', s).query_string() }}">{{ s }} ✕</a>{% endfor %}
+        </div>
+        {% endif %}
+
+        {% if items %}
+        <ol class="items">
+          {% for item in items %}
+          <li class="item">
+            <a class="item-title" href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.title|highlight(filters.q) }}</a>
+            <div class="meta">
+              <a class="source" href="/items?{{ filters.toggled('sources', item.source_id).query_string() }}">{{ item.source_name }}</a>
+              <span class="sep">·</span>
+              <span title="{{ item.when|local }}">{{ item.when|age }}</span>
+              <span class="sep">·</span>
+              <span class="tier tier-{{ item.tier }}">{{ item.tier.replace('_', ' ') }}</span>
+              {% if item.author %}<span class="sep">·</span><span class="muted">{{ item.author }}</span>{% endif %}
+              <span class="sep">·</span>
+              <a class="muted" href="/items/{{ item.id }}">details</a>
+            </div>
+            {% if item.summary %}<p class="summary">{{ item.summary|highlight(filters.q) }}</p>{% endif %}
+            {% if item.topics or item.categories %}
+            <div class="chips">
+              {% for t in item.topics %}
+              <a class="chip topic{% if t in filters.topics %} on{% endif %}" href="/items?{{ filters.toggled('topics', t).query_string() }}">{{ t }}</a>
+              {% endfor %}
+              {% for c in item.categories[:4] %}
+              <a class="chip tag{% if c in filters.tags %} on{% endif %}" href="/items?{{ filters.toggled('tags', c).query_string() }}">{{ c }}</a>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ol>
+
+        {% if has_prev or has_next %}
+        <nav class="pager">
+          {% if has_prev %}
+          <a href="/items?{{ filters.query_string(offset=prev_offset) }}"
+             hx-get="/items?{{ filters.query_string(offset=prev_offset) }}"
+             hx-target="#items-main" hx-select="#items-main" hx-swap="outerHTML" hx-push-url="true">← Newer</a>
+          {% endif %}
+          <span class="muted">{{ showing_from }}–{{ showing_to }} of {{ total }}</span>
+          {% if has_next %}
+          <a href="/items?{{ filters.query_string(offset=next_offset) }}"
+             hx-get="/items?{{ filters.query_string(offset=next_offset) }}"
+             hx-target="#items-main" hx-select="#items-main" hx-swap="outerHTML" hx-push-url="true">Older →</a>
+          {% endif %}
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <p class="empty">
+          Nothing matches.
+          {% if filters.q %}Try fewer words{% if filters.active %}, or{% endif %}{% endif %}
+          {% if filters.active %} <a href="/items">clear the filters</a>.{% endif %}
+        </p>
+        {% endif %}
+      </div>
+    </div>
+  </form>
+</section>
+{% endblock %}

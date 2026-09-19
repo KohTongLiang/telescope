@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+     xmlns:media="http://search.yahoo.com/mrss/"
+     xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Quirky Feed</title>
+    <link>https://example.com/</link>
+    <description>Edge cases that real feeds actually ship</description>
+
+    <!-- 1. tracking params and a fragment in the link -->
+    <item>
+      <title>Studio announces &lt;em&gt;Layoffs&lt;/em&gt; &amp;amp; restructuring</title>
+      <link>https://example.com/news/layoffs?utm_source=rss&amp;utm_medium=feed&amp;id=42#top</link>
+      <guid isPermaLink="false">quirky-001</guid>
+      <pubDate>Mon, 14 Sep 2026 09:30:00 +0000</pubDate>
+      <description><![CDATA[<p>Some <strong>HTML</strong> in the summary.</p><img src="https://example.com/img/one.jpg">]]></description>
+      <media:thumbnail url="https://example.com/img/thumb.jpg" />
+      <category>Business</category>
+    </item>
+
+    <!-- 2. no date at all -->
+    <item>
+      <title>Release date slipping</title>
+      <link>https://example.com/news/delay</link>
+      <guid>quirky-002</guid>
+      <description>No date on this one.</description>
+    </item>
+
+    <!-- 3. duplicate GUID: must collapse, not double-store -->
+    <item>
+      <title>Duplicate GUID entry</title>
+      <link>https://example.com/news/dup</link>
+      <guid>quirky-001</guid>
+      <pubDate>Mon, 14 Sep 2026 10:00:00 +0000</pubDate>
+    </item>
+
+    <!-- 4. relative link, date only in dc:date -->
+    <item>
+      <title>Relative link</title>
+      <link>/news/relative</link>
+      <guid>quirky-003</guid>
+      <dc:date>2026-09-13T18:00:00Z</dc:date>
+    </item>
+
+    <!-- 5. no guid and no link: identity falls back to title -->
+    <item>
+      <title>Only a title here</title>
+      <pubDate>Sun, 13 Sep 2026 07:00:00 GMT</pubDate>
+    </item>
+
+    <!-- 6. unicode and an offset timezone -->
+    <item>
+      <title>日本語のニュース &amp; café — 500€</title>
+      <link>https://example.com/news/unicode</link>
+      <guid>quirky-004</guid>
+      <pubDate>Sat, 12 Sep 2026 23:59:59 +0900</pubDate>
+      <author>staff@example.com (Staff Writer)</author>
+      <description>Ünïcödé ok</description>
+    </item>
+
+    <!-- 7. whitespace everywhere, date that does not parse -->
+    <item>
+      <title>
+         Whitespace
+         everywhere
+      </title>
+      <link>https://example.com/news/space</link>
+      <guid>quirky-005</guid>
+      <pubDate>not a real date</pubDate>
+      <description>   lots    of      spaces   </description>
+    </item>
+  </channel>
+</rss>

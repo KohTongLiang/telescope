@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block content %}
+<section id="stories-main">
+  <form method="get" action="/stories"
+        hx-get="/stories" hx-target="#stories-main" hx-select="#stories-main"
+        hx-swap="outerHTML" hx-push-url="true"
+        hx-trigger="submit, change, keyup changed delay:350ms from:#sq"
+        hx-indicator="#sbusy">
+
+    <div class="page-head compact">
+      <h1>Stories</h1>
+      <p class="muted">The same clustering and ranking the digest uses, over the last {{ hours }}h — {{ items_considered }} items became {{ total }} stories. Nothing is written.</p>
+    </div>
+
+    <div class="searchrow">
+      <select name="hours" aria-label="Window">
+        {% for value, label in window_choices %}
+        <option value="{{ value }}" {% if hours == value %}selected{% endif %}>Last {{ label }}</option>
+        {% endfor %}
+      </select>
+      <input id="sq" type="search" name="q" value="{{ q }}" placeholder="Filter stories by word" autocomplete="off">
+      <button type="submit" class="primary">Apply</button>
+      {% if selected_topics or q %}<a class="clear" href="/stories?hours={{ hours }}">Clear</a>{% endif %}
+      <span id="sbusy" class="htmx-indicator busy">clustering…</span>
+    </div>
+
+    <div class="columns">
+      <aside class="facets">
+        <fieldset class="facet">
+          <legend>Topic <span class="hint">digest section</span></legend>
+          {% for facet in topic_counts %}
+          <label class="check">
+            <input type="checkbox" name="topic" value="{{ facet.name }}" {% if facet.name in selected_topics %}checked{% endif %}>
+            <span class="fname">{{ facet.name }}</span>
+            <span class="fcount">{{ facet.count }}</span>
+          </label>
+          {% else %}
+          <p class="muted small">no items in this window</p>
+          {% endfor %}
+        </fieldset>
+      </aside>
+
+      <div class="results">
+        <div class="resultbar">
+          <span><b>{{ total }}</b> stor{% if total == 1 %}y{% else %}ies{% endif %}</span>
+          <span class="muted">containment {{ config.clustering.containment_threshold }}</span>
+        </div>
+
+        {% if stories %}
+        <ol class="stories">
+          {% for s in stories %}
+          <li class="story">
+            <div class="rank">{{ loop.index }}</div>
+            <div class="story-body">
+              <a class="item-title" href="{{ s.url }}" target="_blank" rel="noopener noreferrer">{{ s.title }}</a>
+              <div class="meta">
+                <span class="cov">{{ s.sources[0] }}{% if s.sources|length > 1 %} +{{ s.sources|length - 1 }} other{% if s.sources|length > 2 %}s{% endif %}{% endif %}</span>
+                <span class="sep">·</span>
+                <span>{{ s.published_at|age }}</span>
+                <span class="sep">·</span>
+                <span class="muted">x{{ s.breadth }} outlet{% if s.breadth != 1 %}s{% endif %}</span>
+                <span class="sep">·</span>
+                <span class="score" title="ranking score">{{ '%.2f'|format(s.score) }}</span>
+              </div>
+              {% if s.summary %}<p class="summary">{{ s.summary }}</p>{% endif %}
+              {% if s.topics or s.entities %}
+              <div class="chips">
+                {% for t in s.topics %}<span class="chip topic">{{ t }}</span>{% endfor %}
+                {% for e in s.entities[:6] %}<span class="chip entity">{{ e }}</span>{% endfor %}
+              </div>
+              {% endif %}
+              {% if s.also_covered_by %}
+              <details>
+                <summary>{{ s.also_covered_by|length }} other report{% if s.also_covered_by|length != 1 %}s{% endif %}</summary>
+                <ul class="plain small">
+                  {% for a in s.also_covered_by %}
+                  <li>
+                    <a href="{{ a.url }}" target="_blank" rel="noopener noreferrer">{{ a.title }}</a>
+                    <span class="muted">{{ a.source_name }} · {{ a.effective_published.isoformat()|age }}</span>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </details>
+              {% endif %}
+            </div>
+          </li>
+          {% endfor %}
+        </ol>
+        {% else %}
+        <p class="empty">No stories in this window{% if selected_topics or q %} match those filters{% endif %}.</p>
+        {% endif %}
+      </div>
+    </div>
+  </form>
+</section>
+{% endblock %}
